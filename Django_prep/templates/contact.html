@@ -1,22 +1,27 @@
 {% extends "base.html" %} 
 {% block title %}Contact{% endblock title %}
  {% block body %}
-<div class="content">
+<div class="contact-page">
   {% if messages %}
     {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}" role="alert">{{ message }}</div>
+      <div class="contact-alert {% if message.tags == 'error' %}contact-alert-error{% else %}contact-alert-success{% endif %}" role="alert">
+        <i class="bi {% if message.tags == 'error' %}bi-exclamation-circle{% else %}bi-check-circle{% endif %}" aria-hidden="true"></i>
+        {{ message }}
+      </div>
     {% endfor %}
   {% endif %}
-  <div class="container mb-3">
-    <div class="row align-items-stretch justify-content-center no-gutters">
-      <div class="col-md-7">
-        <div class="form h-100 contact-wrap p-5">
-          <h3 class="text-center">Let's Talk</h3>
-          <form class="mb-5" method="post" id="contactForm" name="contactForm" action="/contact">
+  <div class="container contact-container">
+    <div class="contact-card">
+      <div class="contact-heading text-center">
+        <span class="contact-kicker"><i class="bi bi-chat-square-dots" aria-hidden="true"></i> Get in touch</span>
+        <h1>Let's Talk</h1>
+        <p>Have a project, opportunity, or question? Send a message and I will get back to you.</p>
+      </div>
+      <form method="post" id="contactForm" action="{% url 'contact' %}">
           {% csrf_token %}
             <div class="row">
               <div class="col-md-6 form-group mb-3">
-                <label for="" class="col-form-label">Name *</label>
+                <label for="name" class="col-form-label">Name <span>*</span></label>
                 <input
                   type="text"
                   class="form-control"
@@ -28,7 +33,7 @@
                 />
               </div>
               <div class="col-md-6 form-group mb-3">
-                <label for="" class="col-form-label">Email *</label>
+                <label for="email" class="col-form-label">Email <span>*</span></label>
                 <input
                   type="email"
                   class="form-control"
@@ -43,7 +48,7 @@
 
             <div class="row">
               <div class="col-md-12 form-group mb-3">
-                <label for="budget" class="col-form-label">Subject</label>
+                <label for="subject" class="col-form-label">Subject</label>
                 <input
                   type="text"
                   class="form-control"
@@ -55,9 +60,9 @@
               </div>
             </div>
 
-            <div class="row mb-5">
+            <div class="row mb-4">
               <div class="col-md-12 form-group mb-3">
-                <label for="message" class="col-form-label">Message *</label>
+                <label for="desc" class="col-form-label">Message <span>*</span></label>
                 <textarea
                   class="form-control"
                   name="desc"
@@ -69,24 +74,12 @@
                 >{{ form_data.desc|default:'' }}</textarea>
               </div>
             </div>
-            <!-- {% comment %} <div class="row justify-content-center">
-              <div class="col-md-5 form-group text-center">
-                <input
-                  type="submit"
-                  value="Send Message"
-                  class="btn btn-block btn-primary rounded-0 py-2 px-4"
-                />
-                <span class="submitting"></span>
-              </div>
-            </div> {% endcomment %} -->
             <div class="row justify-content-center">
-            <button class="btn btn-block btn-primary rounded-0 py-2 px-4" type="submit">
-                <div class="row justify-content-center"> Submit </div>
+            <button class="btn contact-submit" type="submit">
+                <span>Send Message</span> <i class="bi bi-send" aria-hidden="true"></i>
             </button>   
-            
-          </form>
-        </div>
-      </div>
+            </div>
+      </form>
     </div>
   </div>
 </div>

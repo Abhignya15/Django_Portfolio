@@ -12,29 +12,29 @@
     <link href="{% static 'css/cover_custom.css' %}?v=3" rel="stylesheet">
   </head>
 <body class="d-flex flex-column h-100 text-bg-dark">
-<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+<nav class="navbar navbar-expand-lg site-nav" data-bs-theme="dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">AT</a>
+    <a class="navbar-brand site-brand" href="/">AT</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/">Home</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %} href="/">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/experience">Experience</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'experience' %}active{% endif %}" {% if request.resolver_match.url_name == 'experience' %}aria-current="page"{% endif %} href="/experience">Experience</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/achievements">Achievements</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'achievemnents' %}active{% endif %}" {% if request.resolver_match.url_name == 'achievemnents' %}aria-current="page"{% endif %} href="/achievements">Achievements</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/contact">Contact</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" {% if request.resolver_match.url_name == 'contact' %}aria-current="page"{% endif %} href="/contact">Contact</a>
         </li>
       </ul>
       <div class="d-flex ms-auto">
-        <a class="btn btn-sm btn-outline-light ms-3" href="{% static 'resume.pdf' %}" target="_blank">Download Resume</a>
+        <a class="btn btn-sm btn-outline-light ms-3 resume-btn" href="{% static 'resume.pdf' %}" target="_blank"><i class="bi bi-download" aria-hidden="true"></i> Download Resume</a>
       </div>
     </div>
   </div>
