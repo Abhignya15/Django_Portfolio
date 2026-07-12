@@ -1,0 +1,4 @@
+# In django there are projects and apps 
+# The first one that we create initially is called project and then later 
+# what we create using python manage.py startapp home is the app
+# create urls.py in the app

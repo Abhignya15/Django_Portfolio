@@ -1,0 +1,101 @@
+:root{
+  --accent: #7b61ff;
+}
+/* Gradient text */
+.gradient-text{
+  background: linear-gradient(90deg,#9b7bff,#6ee7f3,#7b61ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Force light text for better contrast on dark background */
+.cover-container,
+.cover-container h1,
+.cover-container h2,
+.cover-container h3,
+.cover-container p,
+.cover-container a,
+.cover-container li,
+.cover-container .card,
+.cover-container .card * {
+  color: #ffffff !important;
+}
+
+.cover-container .text-muted {
+  color: rgba(255,255,255,0.62) !important;
+}
+
+.cover-container .lead {
+  color: rgba(255,255,255,0.72) !important;
+}
+
+.cover-container .nav-link {
+  color: rgba(255,255,255,0.9) !important;
+}
+
+/* Ensure cover fills the viewport height */
+.cover-container{
+  min-height:120vh;
+}
+
+/* Larger stacked name styling */
+.name-line{
+  line-height:0.95;
+  letter-spacing: -0.5px;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+/* Bitmoji wrapper and ring */
+.bitmoji-wrap{
+  width: 320px;
+  height: 320px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:auto;
+  position:relative;
+}
+.bitmoji-img{
+  width:260px;
+  height:260px;
+  object-fit:cover;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.7), inset 0 2px 8px rgba(255,255,255,0.02);
+  border:8px solid rgba(123,97,255,0.08);
+}
+.bitmoji-wrap::before{
+  content:'';
+  position:absolute;
+  width:380px;
+  height:380px;
+  border-radius:50%;
+  background: radial-gradient(circle at center, rgba(123,97,255,0.14), rgba(0,0,0,0.15));
+  filter: blur(22px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  z-index:-1;
+}
+
+/* Tech badges */
+.tech-badge{
+  padding:0.45rem 0.7rem;
+  border-radius:12px;
+  background: rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.04);
+}
+
+/* Cards transparent look */
+.card.border-secondary{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-color: rgba(255,255,255,0.06);
+}
+
+/* Buttons */
+.btn-primary{
+  background: linear-gradient(90deg,var(--accent),#5be7ff);
+  border: none;
+}
+
+@media (max-width:767px){
+  .bitmoji-wrap{width:200px;height:200px}
+  .bitmoji-img{width:160px;height:160px}
+}

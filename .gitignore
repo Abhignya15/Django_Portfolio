@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.env
+
+# Django/local development
+*.sqlite3
+staticfiles/
+media/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# macOS and editors
+.DS_Store
+.vscode/
