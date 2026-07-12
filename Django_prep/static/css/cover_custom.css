@@ -34,9 +34,25 @@
   color: rgba(255,255,255,0.9) !important;
 }
 
-/* Ensure cover fills the viewport height */
+/* Keep the homepage content centered between the navbar and footer. */
 .cover-container{
-  min-height:120vh;
+  width:100%;
+  max-width:1200px;
+  min-height:calc(100vh - 56px);
+  height:auto !important;
+  flex-shrink:0;
+}
+
+.hero-section{
+  min-height:calc(100vh - 180px);
+}
+
+main{
+  width:100%;
+}
+
+section{
+  padding-bottom:2rem;
 }
 
 /* Larger stacked name styling */
@@ -96,6 +112,8 @@
 }
 
 @media (max-width:767px){
+  .hero-section{min-height:auto;padding-top:2rem}
+  .cover-container{padding-left:1rem !important;padding-right:1rem !important}
   .bitmoji-wrap{width:200px;height:200px}
   .bitmoji-img{width:160px;height:160px}
 }
