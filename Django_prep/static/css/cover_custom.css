@@ -38,17 +38,27 @@
 .cover-container{
   width:100%;
   max-width:1200px;
-  min-height:calc(100vh - 56px);
+  min-height:0;
   height:auto !important;
   flex-shrink:0;
 }
 
 .hero-section{
-  min-height:clamp(360px, calc(100vh - 360px), 520px);
+  min-height:clamp(300px, calc(100vh - 520px), 400px);
 }
 
 main{
   width:100%;
+}
+
+.cover-container > main,
+.cover-container > footer{
+  flex:0 0 auto;
+}
+
+.cover-container > footer{
+  margin-top:0;
+  clear:both;
 }
 
 section{
@@ -57,9 +67,15 @@ section{
 
 /* Larger stacked name styling */
 .name-line{
+  font-size:clamp(1.75rem, 3.2vw, 2.6rem);
   line-height:0.95;
   letter-spacing: -0.5px;
   text-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+.hero-greeting{
+  font-size:clamp(1.5rem, 3vw, 2.4rem);
+  line-height:1.05;
 }
 
 /* Bitmoji wrapper and ring */
@@ -97,12 +113,83 @@ section{
   border-radius:12px;
   background: rgba(255,255,255,0.03);
   border:1px solid rgba(255,255,255,0.04);
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+}
+
+.tech-badge i{
+  font-size:1rem;
+  line-height:1;
+}
+
+.tech-logo{
+  width:1rem;
+  height:1rem;
+  object-fit:contain;
+}
+
+.monochrome-logo{
+  filter:grayscale(1) brightness(0) invert(1);
 }
 
 /* Cards transparent look */
 .card.border-secondary{
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border-color: rgba(255,255,255,0.06);
+}
+
+.cover-container > main > section:first-of-type .row{
+  align-items:stretch;
+}
+
+.cover-container > main > section:first-of-type .col-md-6{
+  display:flex;
+}
+
+.cover-container > main > section:first-of-type .card{
+  width:100%;
+}
+
+.section-heading{
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  padding-bottom:0.6rem;
+}
+
+.section-heading i,
+.focus-icon i{
+  color:var(--accent);
+}
+
+.focus-card{
+  display:flex;
+  gap:0.75rem;
+  padding:1rem;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:0.5rem;
+  background:rgba(255,255,255,0.02);
+}
+
+.focus-icon{
+  display:grid;
+  place-items:center;
+  flex:0 0 2.25rem;
+  height:2.25rem;
+  border:1px solid rgba(123,97,255,0.7);
+  border-radius:0.4rem;
+  box-shadow:0 0 12px rgba(123,97,255,0.35);
+}
+
+.focus-card h6{margin:0 0 0.35rem;font-size:0.85rem}
+.focus-card p{margin:0;color:rgba(255,255,255,0.6);font-size:0.75rem}
+
+.focus-section{
+  padding-bottom:0;
+  margin-top:0.5rem !important;
+}
+
+main > section:first-of-type{
+  padding-bottom:0.75rem;
 }
 
 /* Buttons */
