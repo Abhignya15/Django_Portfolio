@@ -1,4 +1,121 @@
-# In django there are projects and apps 
-# The first one that we create initially is called project and then later 
-# what we create using python manage.py startapp home is the app
-# create urls.py in the app
+# Django Portfolio
+
+A Django portfolio website with a dark, responsive interface, contact form, experience page, achievements page, technology stack, and Docker deployment support.
+
+## Project structure
+
+- `Django_prep/` - Django project directory
+- `home/` - Main Django application
+- `templates/` - HTML templates
+- `static/` - CSS, images, and other source static assets
+- `manage.py` - Django management command entry point
+- `requirements.txt` - Python dependencies
+- `../Dockerfile` - Docker image configuration at the repository root
+
+## Local development
+
+From the repository root:
+
+```bash
+cd Django_prep
+source ../.venv/bin/activate
+../.venv/bin/python manage.py migrate
+../.venv/bin/python manage.py runserver
+```
+
+Open http://127.0.0.1:8000/ in a browser.
+
+If `python` is not available on macOS, use the virtual environment executable shown above or use `python3`.
+
+## Install dependencies manually
+
+From the repository root:
+
+```bash
+cd Django_prep
+../.venv/bin/python -m pip install -r requirements.txt
+```
+
+## Environment variables
+
+For production, set these variables instead of using development defaults:
+
+```bash
+export DJANGO_SECRET_KEY="replace-with-a-long-random-secret"
+export DJANGO_DEBUG="False"
+export DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1"
+```
+
+For a deployed domain, replace the allowed hosts value with your domain. Do not commit `.env` files or secret keys to GitHub.
+
+## Docker
+
+Docker Desktop must be installed and running. From the repository root, where the `Dockerfile` is located:
+
+```bash
+docker --version
+docker info
+docker build -t django-portfolio .
+```
+
+Run the container:
+
+```bash
+docker run --name django-portfolio-container \
+	-p 8000:8000 \
+	-e DJANGO_SECRET_KEY="replace-with-a-long-random-secret" \
+	-e DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1" \
+	django-portfolio
+```
+
+Open http://127.0.0.1:8000/. The container installs dependencies, collects static files, runs migrations, and starts Gunicorn on port `8000`.
+
+### Create the Django admin superuser
+
+The Docker image intentionally does not contain a database or admin account. Create the account after the container is running:
+
+```bash
+docker exec -it django-portfolio-container \
+	python manage.py createsuperuser
+```
+
+Follow the prompts for the username, email address, and password. Then open:
+
+http://127.0.0.1:8000/admin/
+
+Sign in with the superuser credentials. If the container has been stopped, start it first with `docker start django-portfolio-container`.
+
+The project currently uses SQLite. The database is stored inside the container, so deleting the container deletes the admin account and any database data. Do not run `docker rm` if you need to keep the current local admin account. For production, use a managed database rather than relying on SQLite inside a disposable container.
+
+Useful Docker commands:
+
+```bash
+docker ps
+docker logs -f django-portfolio-container
+docker stop django-portfolio-container
+docker start django-portfolio-container
+docker rm django-portfolio-container
+```
+
+If port `8000` is occupied, use `-p 8080:8000` and open http://127.0.0.1:8080/.
+
+## Static files
+
+Source assets inside `static/` are committed to GitHub. Generated files inside `staticfiles/` are ignored and created by `collectstatic` during the Docker image build.
+
+## GitHub checklist
+
+Before pushing, run:
+
+```bash
+git status
+git diff --check
+git add .
+git status
+git commit -m "Dockerize Django portfolio"
+git push origin main
+```
+
+If your branch is named `master`, use `git push origin master` instead.
+
+Do not commit `.venv/`, `node_modules/`, `db.sqlite3`, `__pycache__/`, `.env`, or generated `staticfiles/`.
