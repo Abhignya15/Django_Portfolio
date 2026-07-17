@@ -1,7 +1,16 @@
 module "ecs" {
   source  = "terraform-aws-modules/ecs/aws"
   version = "~> 6.0"
+  data "aws_vpc" "default" {
+  default = true
+}
 
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
   cluster_name = "django-portfolio-cluster"
 
   cluster_configuration = {
@@ -69,7 +78,7 @@ module "ecs" {
         }
       }
 
-      subnet_ids = var.subnet_ids
+      subnet_ids = data.aws_subnets.default.ids
 
       security_group_rules = {
         ingress = {
