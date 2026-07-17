@@ -127,6 +127,14 @@
             "Resource": "arn:aws:iam::376210054447:role/ecsTaskExecutionRole"
         },
         {
+            "Sid": "ReadEcsServiceLinkedRole",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole"
+            ],
+            "Resource": "arn:aws:iam::376210054447:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS"
+        },
+        {
             "Sid": "CreateEcsServiceLinkedRole",
             "Effect": "Allow",
             "Action": [
