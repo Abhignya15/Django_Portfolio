@@ -37,9 +37,12 @@ module "ecs" {
 
   services = {
     django-portfolio = {
-      cpu                    = 256
-      memory                 = 512
-      task_exec_iam_role_arn = data.aws_iam_role.ecs_task_execution.arn
+      cpu                       = 256
+      memory                    = 512
+      create_task_exec_iam_role = false
+      task_exec_iam_role_arn    = data.aws_iam_role.ecs_task_execution.arn
+      create_task_exec_policy   = false
+      create_tasks_iam_role     = false
 
       desired_count = 1
 
