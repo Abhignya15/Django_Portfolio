@@ -1,7 +1,4 @@
-module "ecs" {
-  source  = "terraform-aws-modules/ecs/aws"
-  version = "~> 6.0"
-  data "aws_vpc" "default" {
+data "aws_vpc" "default" {
   default = true
 }
 
@@ -11,6 +8,11 @@ data "aws_subnets" "default" {
     values = [data.aws_vpc.default.id]
   }
 }
+
+module "ecs" {
+  source  = "terraform-aws-modules/ecs/aws"
+  version = "~> 6.0"
+
   cluster_name = "django-portfolio-cluster"
 
   cluster_configuration = {
