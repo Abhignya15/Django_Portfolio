@@ -123,5 +123,4 @@ module "ecs" {
     Project     = "Django Portfolio"
     Environment = "production"
   }
-  depends_on = [data.aws_iam_role.ecs_service_linked]
 }
