@@ -18,17 +18,16 @@
             "Resource": "*"
         },
         {
-            "Sid": "EcrImageManagement",
+            "Sid": "EcrImagePush",
             "Effect": "Allow",
             "Action": [
                 "ecr:GetAuthorizationToken",
                 "ecr:BatchCheckLayerAvailability",
-                "ecr:BatchGetImage",
                 "ecr:CompleteLayerUpload",
-                "ecr:DescribeImages",
                 "ecr:InitiateLayerUpload",
                 "ecr:PutImage",
-                "ecr:UploadLayerPart"
+                "ecr:UploadLayerPart",
+                "ecr:BatchGetImage"
             ],
             "Resource": "*"
         },
@@ -55,25 +54,25 @@
             ]
         },
         {
-            "Sid": "EcsClusterAndServiceManagement",
+            "Sid": "ManageEcs",
             "Effect": "Allow",
             "Action": [
                 "ecs:CreateCluster",
+                "ecs:UpdateCluster",
                 "ecs:DeleteCluster",
                 "ecs:DescribeClusters",
-                "ecs:UpdateCluster",
                 "ecs:PutClusterCapacityProviders",
                 "ecs:CreateService",
+                "ecs:UpdateService",
                 "ecs:DeleteService",
                 "ecs:DescribeServices",
-                "ecs:UpdateService",
                 "ecs:RegisterTaskDefinition",
                 "ecs:DeregisterTaskDefinition",
                 "ecs:DescribeTaskDefinition",
-                "ecs:ListTaskDefinitions",
                 "ecs:ListTagsForResource",
                 "ecs:TagResource",
-                "ecs:UntagResource"
+                "ecs:UntagResource",
+                "ec2:DescribeVpcAttribute"
             ],
             "Resource": "*"
         },
@@ -126,6 +125,19 @@
                 "iam:PassRole"
             ],
             "Resource": "arn:aws:iam::376210054447:role/ecsTaskExecutionRole"
+        },
+        {
+            "Sid": "CreateEcsServiceLinkedRole",
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateServiceLinkedRole"
+            ],
+            "Resource": "arn:aws:iam::376210054447:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+            "Condition": {
+                "StringEquals": {
+                    "iam:AWSServiceName": "ecs.amazonaws.com"
+                }
+            }
         }
     ]
 }

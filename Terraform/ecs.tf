@@ -13,6 +13,11 @@ data "aws_iam_role" "ecs_task_execution" {
   name = "ecsTaskExecutionRole"
 }
 
+resource "aws_iam_service_linked_role" "ecs" {
+  aws_service_name = "ecs.amazonaws.com"
+  description      = "Service-linked role for Amazon ECS"
+}
+
 module "ecs" {
   source  = "terraform-aws-modules/ecs/aws"
   version = "~> 6.0"
@@ -118,4 +123,6 @@ module "ecs" {
     Project     = "Django Portfolio"
     Environment = "production"
   }
+
+  depends_on = [aws_iam_service_linked_role.ecs]
 }
