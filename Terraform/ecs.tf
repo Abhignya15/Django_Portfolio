@@ -10,18 +10,13 @@ module "ecs" {
     }
   }
 
-  cluster_capacity_providers = {
+  default_capacity_provider_strategy = {
     FARGATE = {
-      default_capacity_provider_strategy = {
-        weight = 1
-        base   = 1
-      }
+      weight = 1
+      base   = 1
     }
-
     FARGATE_SPOT = {
-      default_capacity_provider_strategy = {
-        weight = 0
-      }
+      weight = 0
     }
   }
 

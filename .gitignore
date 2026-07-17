@@ -19,3 +19,11 @@ npm-debug.log*
 # macOS and editors
 .DS_Store
 .vscode/
+
+# Terraform
+Terraform/.terraform/
+Terraform/*.tfstate
+Terraform/*.tfstate.*
+Terraform/*.tfplan
+Terraform/crash.log
+Terraform/crash.*.log
