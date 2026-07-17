@@ -14,7 +14,7 @@ resource "aws_ecr_lifecycle_policy" "portfolio" {
     rules = [
       {
         rulePriority = 1
-        description   = "Keep the 10 most recent images"
+        description  = "Keep the 10 most recent images"
         selection = {
           tagStatus   = "any"
           countType   = "imageCountMoreThan"
