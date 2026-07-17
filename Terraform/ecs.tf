@@ -9,6 +9,10 @@ data "aws_subnets" "default" {
   }
 }
 
+data "aws_iam_role" "ecs_task_execution" {
+  name = "ecsTaskExecutionRole"
+}
+
 module "ecs" {
   source  = "terraform-aws-modules/ecs/aws"
   version = "~> 6.0"
@@ -33,8 +37,9 @@ module "ecs" {
 
   services = {
     django-portfolio = {
-      cpu    = 256
-      memory = 512
+      cpu                    = 256
+      memory                 = 512
+      task_exec_iam_role_arn = data.aws_iam_role.ecs_task_execution.arn
 
       desired_count = 1
 
@@ -77,6 +82,9 @@ module "ecs" {
               awslogs-stream-prefix = "django"
             }
           }
+
+          create_cloudwatch_log_group = true
+          cloudwatch_log_group_name   = "/aws/ecs/django-portfolio"
         }
       }
 
