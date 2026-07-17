@@ -111,7 +111,6 @@ module "ecs" {
       assign_public_ip = true
     }
   }
-
   tags = {
     Project     = "Django Portfolio"
     Environment = "production"
