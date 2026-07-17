@@ -47,6 +47,7 @@ module "ecs" {
       task_exec_iam_role_arn    = data.aws_iam_role.ecs_task_execution.arn
       create_task_exec_policy   = false
       create_tasks_iam_role     = false
+      enable_autoscaling        = false
 
       desired_count = 1
 
