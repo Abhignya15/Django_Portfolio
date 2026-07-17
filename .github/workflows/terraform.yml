@@ -47,10 +47,14 @@ jobs:
         run: terraform fmt -check -recursive
 
       - name: Initialize Terraform
-        run: terraform init -backend=false
+        run: terraform init -input=false
 
       - name: Validate Terraform
         run: terraform validate
 
       - name: Create Terraform plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Apply Terraform plan
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -input=false tfplan
