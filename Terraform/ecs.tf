@@ -109,10 +109,6 @@ module "ecs" {
               value = var.db_username
             },
             {
-              name  = "DB_PASSWORD"
-              value = var.db_password
-            },
-            {
               name  = "DB_HOST"
               value = aws_db_instance.portfolio.address
             },
