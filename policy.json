@@ -166,7 +166,8 @@
                 "rds:DescribeDBParameterGroups",
                 "rds:AddTagsToResource",
                 "rds:RemoveTagsFromResource",
-                "rds:DescribeOrderableDBInstanceOptions"
+                "rds:DescribeOrderableDBInstanceOptions",
+                "rds:ListTagsForResource"
             ],
             "Resource": "*"
         }
