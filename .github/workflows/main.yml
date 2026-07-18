@@ -59,3 +59,63 @@ jobs:
           aws ecs wait services-stable \
             --cluster "$ECS_CLUSTER" \
             --services "$ECS_SERVICE"
+
+  migrate:
+    name: Run Django migrations on ECS
+    needs: docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build overrides JSON
+        run: |
+          cat > override.json <<'EOF'
+          {
+            "containerOverrides": [
+              {
+                "name": "django-portfolio",
+                "command": ["python","manage.py","migrate","--noinput"],
+                "environment": [
+                  {"name":"DB_HOST","value":"${{ secrets.DB_HOST }}"},
+                  {"name":"DB_NAME","value":"${{ secrets.DB_NAME }}"},
+                  {"name":"DB_USER","value":"${{ secrets.DB_USER }}"},
+                  {"name":"DB_PASSWORD","value":"${{ secrets.DB_PASSWORD }}"},
+                  {"name":"DB_PORT","value":"5432"}
+                ]
+              }
+            ]
+          }
+          EOF
+
+      - name: Get task definition and network config from service
+        id: svc
+        run: |
+          TASK_DEF=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].taskDefinition' --output text)
+          echo "task_definition=$TASK_DEF" >> $GITHUB_OUTPUT
+          NETCONF=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].networkConfiguration.awsvpcConfiguration' --output json)
+          echo "network_configuration=$NETCONF" >> $GITHUB_OUTPUT
+
+      - name: Run one-off ECS Fargate task (migrate)
+        run: |
+          echo "Running task using task definition ${{ steps.svc.outputs.task_definition }}"
+          aws ecs run-task \
+            --cluster "$ECS_CLUSTER" \
+            --task-definition "${{ steps.svc.outputs.task_definition }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration=${{ steps.svc.outputs.network_configuration }}" \
+            --overrides file://override.json
+
+      - name: Wait for migrate task to stop and show exit code
+        run: |
+          # find most recent run task arn
+          TASK_ARN=$(aws ecs list-tasks --cluster "$ECS_CLUSTER" --family "${{ steps.svc.outputs.task_definition }}" --desired-status RUNNING --query 'taskArns[0]' --output text)
+          if [ "$TASK_ARN" = "None" ] || [ -z "$TASK_ARN" ]; then
+            TASK_ARN=$(aws ecs list-tasks --cluster "$ECS_CLUSTER" --desired-status RUNNING --query 'taskArns[0]' --output text)
+          fi
+          aws ecs wait tasks-stopped --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN"
+          aws ecs describe-tasks --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN" --query 'tasks[0].containers[0].exitCode'
