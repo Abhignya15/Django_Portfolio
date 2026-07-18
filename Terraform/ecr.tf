@@ -27,7 +27,6 @@ resource "aws_ecr_lifecycle_policy" "portfolio" {
     ]
   })
 }
-
 output "ecr_repository_url" {
   description = "ECR repository URL used to tag and push Docker images"
   value       = aws_ecr_repository.portfolio.repository_url
