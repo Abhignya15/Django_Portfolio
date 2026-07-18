@@ -54,13 +54,11 @@ resource "aws_db_instance" "portfolio" {
   db_subnet_group_name   = aws_db_subnet_group.portfolio.name
   vpc_security_group_ids = [aws_security_group.rds.id]
 
-  publicly_accessible = true
-  multi_az            = false
-  skip_final_snapshot = true
-  deletion_protection = false
-
+  publicly_accessible     = true
+  multi_az                = false
+  skip_final_snapshot     = true
+  deletion_protection     = false
   backup_retention_period = 1
-  publically_accesible = true 
 
   tags = {
     Name        = "django-portfolio-db"
