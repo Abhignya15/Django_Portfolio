@@ -67,18 +67,3 @@ resource "aws_db_instance" "portfolio" {
     Environment = "production"
   }
 }
-
-resource "aws_secretsmanager_secret" "db_password" {
-  name                    = "django-portfolio/db-password"
-  description             = "PostgreSQL password for the Django portfolio"
-  recovery_window_in_days = 0
-
-  tags = {
-    Project = "Django Portfolio"
-  }
-}
-
-resource "aws_secretsmanager_secret_version" "db_password" {
-  secret_id     = aws_secretsmanager_secret.db_password.id
-  secret_string = var.db_password
-}
