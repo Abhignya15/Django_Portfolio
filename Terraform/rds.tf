@@ -20,7 +20,13 @@ resource "aws_security_group" "rds" {
     to_port         = 5432
     security_groups = [aws_security_group.ecs.id]
   }
-
+  ingress {
+    description = "Temporary DBeaver access"
+    protocol    = "tcp"
+    from_port   = 5432
+    to_port     = 5432
+    cidr_blocks = ["203.212.204.198/32"]
+  }
   egress {
     protocol    = "-1"
     from_port   = 0
