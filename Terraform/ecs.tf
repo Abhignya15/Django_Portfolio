@@ -17,6 +17,27 @@ data "aws_iam_role" "ecs_service_linked" {
   name = "AWSServiceRoleForECS"
 }
 
+resource "aws_security_group" "ecs" {
+  name        = "django-portfolio-ecs"
+  description = "Allow public HTTP access to the Django ECS service"
+  vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+    description = "Django application"
+    protocol    = "tcp"
+    from_port   = 8000
+    to_port     = 8000
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 module "ecs" {
   source  = "terraform-aws-modules/ecs/aws"
   version = "~> 6.0"
@@ -78,6 +99,26 @@ module "ecs" {
             {
               name  = "DJANGO_ALLOWED_HOSTS"
               value = "*"
+            },
+            {
+              name  = "DB_NAME"
+              value = var.db_name
+            },
+            {
+              name  = "DB_USER"
+              value = var.db_username
+            },
+            {
+              name  = "DB_PASSWORD"
+              value = var.db_password
+            },
+            {
+              name  = "DB_HOST"
+              value = aws_db_instance.portfolio.address
+            },
+            {
+              name  = "DB_PORT"
+              value = "5432"
             }
           ]
 
@@ -96,25 +137,8 @@ module "ecs" {
         }
       }
 
-      subnet_ids = data.aws_subnets.default.ids
-
-      security_group_rules = {
-        ingress = {
-          type        = "ingress"
-          from_port   = 8000
-          to_port     = 8000
-          protocol    = "tcp"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-
-        egress = {
-          type        = "egress"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
+      subnet_ids         = data.aws_subnets.default.ids
+      security_group_ids = [aws_security_group.ecs.id]
 
       assign_public_ip = true
     }
@@ -124,3 +148,4 @@ module "ecs" {
     Environment = "production"
   }
 }
+
