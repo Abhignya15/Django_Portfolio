@@ -30,8 +30,27 @@ jobs:
         run: |
           python Django_prep/manage.py collectstatic --noinput
 
-      - name: Deploy static to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./staticfiles
+      - name: Deploy static to gh-pages (force-push)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git checkout gh-pages
+            git rm -rf . || true
+          else
+            git checkout --orphan gh-pages
+          fi
+          # copy staticfiles into repo root
+          cp -r staticfiles/. . || true
+          touch .nojekyll
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+          else
+            git commit -m "Publish staticfiles from workflow: ${GITHUB_SHA}"
+            git push origin HEAD:gh-pages --force
+          fi
