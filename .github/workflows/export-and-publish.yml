@@ -1,0 +1,74 @@
+name: Export full site and publish to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Django_prep/**'
+      - 'templates/**'
+      - 'static/**'
+      - 'Dockerfile'
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r Django_prep/requirements.txt
+
+      - name: Collect static
+        run: |
+          python Django_prep/manage.py collectstatic --noinput
+
+      - name: Start Django (background)
+        run: |
+          python Django_prep/manage.py runserver 0.0.0.0:8000 &
+
+      - name: Wait for local site to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://127.0.0.1:8000 >/dev/null 2>&1; then
+              echo "site is up"; break
+            else
+              echo "waiting..."; sleep 1
+            fi
+          done
+
+      - name: Mirror site with wget
+        run: |
+          # mirror the entire site into ./site
+          wget --mirror --convert-links --adjust-extension --page-requisites --no-parent http://127.0.0.1:8000 -P ./site
+          # wget creates a directory like ./site/127.0.0.1:8000; move its contents to ./site-root
+          export DIR=$(find ./site -maxdepth 1 -type d -name "127.0.0.1*" -print -quit)
+          if [ -n "$DIR" ]; then
+            mkdir -p ./site-root
+            shopt -s dotglob || true
+            mv "$DIR"/* ./site-root/ || true
+            rm -rf ./site
+            mv ./site-root ./site
+          fi
+
+      - name: Clean up site folder
+        run: |
+          # remove any Git metadata and unnecessary files
+          rm -rf site/**/.git || true
+
+      - name: Publish exported site to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
