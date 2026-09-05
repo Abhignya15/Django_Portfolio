@@ -73,8 +73,29 @@ jobs:
           # remove any Git metadata and unnecessary files
           rm -rf site/**/.git || true
 
-      - name: Publish exported site to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+      - name: Force-push exported site to gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          # Prepare branch
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git checkout gh-pages
+            git rm -rf . || true
+          else
+            git checkout --orphan gh-pages
+          fi
+          # Copy site contents into repo root
+          cp -r site/. . || true
+          # Ensure .nojekyll exists to allow GitHub Pages
+          touch .nojekyll
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+          else
+            git commit -m "Publish site from export workflow: ${GITHUB_SHA}"
+            git push origin HEAD:gh-pages --force
+          fi
