@@ -36,7 +36,8 @@ jobs:
 
       - name: Start Django (background)
         run: |
-          python Django_prep/manage.py runserver 0.0.0.0:8000 &
+          # start without the autoreloader so the process stays in background
+          nohup python Django_prep/manage.py runserver 0.0.0.0:8000 --noreload &>/dev/null &
 
       - name: Wait for local site to be ready
         run: |
@@ -61,6 +62,11 @@ jobs:
             rm -rf ./site
             mv ./site-root ./site
           fi
+
+      - name: Debug site folder
+        run: |
+          echo "site folder contents:" && ls -la ./site || true
+          echo "top-level files:" && ls -la || true
 
       - name: Clean up site folder
         run: |
