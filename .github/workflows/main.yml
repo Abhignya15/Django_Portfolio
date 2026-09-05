@@ -97,7 +97,8 @@ jobs:
         run: |
           TASK_DEF=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].taskDefinition' --output text)
           echo "task_definition=$TASK_DEF" >> $GITHUB_OUTPUT
-          NETCONF=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].networkConfiguration.awsvpcConfiguration' --output json)
+          # compact network config to a single line to avoid GitHub Actions output parsing issues
+          NETCONF=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].networkConfiguration.awsvpcConfiguration' --output json | tr -d '\n')
           echo "network_configuration=$NETCONF" >> $GITHUB_OUTPUT
 
       - name: Run one-off ECS Fargate task (migrate)
