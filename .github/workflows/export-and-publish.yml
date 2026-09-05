@@ -51,22 +51,21 @@ jobs:
 
       - name: Mirror site with wget
         run: |
-          # mirror the entire site into ./site
-          wget --mirror --convert-links --adjust-extension --page-requisites --no-parent http://127.0.0.1:8000 -P ./site
-          # wget creates a directory like ./site/127.0.0.1:8000; move its contents to ./site-root
-          export DIR=$(find ./site -maxdepth 1 -type d -name "127.0.0.1*" -print -quit)
-          if [ -n "$DIR" ]; then
-            mkdir -p ./site-root
+          # mirror the entire site into ./site (avoid host-named directory)
+          wget --mirror --convert-links --adjust-extension --page-requisites --no-parent \
+            --no-host-directories -nH --directory-prefix=site http://127.0.0.1:8000 -o site/wget.log || true
+          # fallback: if wget created nested host-dir, move contents
+          if [ -d ./site/127.0.0.1:8000 ]; then
             shopt -s dotglob || true
-            mv "$DIR"/* ./site-root/ || true
-            rm -rf ./site
-            mv ./site-root ./site
+            mv ./site/127.0.0.1:8000/* ./site/ || true
+            rm -rf ./site/127.0.0.1:8000 || true
           fi
 
       - name: Debug site folder
         run: |
-          echo "site folder contents:" && ls -la ./site || true
-          echo "top-level files:" && ls -la || true
+          echo "site folder recursive listing:" && ls -laR ./site || true
+          echo "wget log (tail):" && tail -n 200 site/wget.log || true
+          echo "top-level files in workspace:" && ls -la || true
 
       - name: Clean up site folder
         run: |
@@ -81,6 +80,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin
+          echo "branches:" && git branch -a || true
           # Prepare branch
           if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
             git checkout gh-pages
@@ -88,8 +88,10 @@ jobs:
           else
             git checkout --orphan gh-pages
           fi
+          echo "current branch:" && git rev-parse --abbrev-ref HEAD || true
           # Copy site contents into repo root
           cp -r site/. . || true
+          echo "files staged for commit:" && git add -A && git status --porcelain || true
           # Ensure .nojekyll exists to allow GitHub Pages
           touch .nojekyll
           git add -A
