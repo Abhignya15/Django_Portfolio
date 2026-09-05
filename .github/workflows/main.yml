@@ -34,12 +34,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Validate required DB secrets
-        run: |
-          if [ -z "${{ secrets.DB_HOST }}" ] || [ -z "${{ secrets.DB_NAME }}" ] || [ -z "${{ secrets.DB_USER }}" ] || [ -z "${{ secrets.DB_PASSWORD }}" ]; then
-            echo "One or more required DB secrets (DB_HOST, DB_NAME, DB_USER, DB_PASSWORD) are missing or empty."
-            exit 1
-          fi
+      # No DB secrets required for build/publish
 
       - name: Log in to Amazon ECR
         id: login-ecr

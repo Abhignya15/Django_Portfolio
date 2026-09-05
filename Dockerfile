@@ -14,4 +14,6 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn Django_prep.wsgi:application --bind 0.0.0.0:8000 --workers 2"]
+# Start Gunicorn directly (do NOT run migrations here) so the container can start without a DB.
+# Migrations will be skipped for now to allow the static site to run with SQLite or no DB.
+CMD ["gunicorn", "Django_prep.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
