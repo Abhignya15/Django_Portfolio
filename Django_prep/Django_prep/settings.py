@@ -138,7 +138,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# Allow overriding STATIC_URL from environment for CI/CD or external hosting
+STATIC_URL = os.environ.get('STATIC_URL', '/static/')
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
@@ -146,3 +147,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
+
+# Use WhiteNoise compressed manifest storage by default for cache-busting
+# Can be overridden via the STATICFILES_STORAGE env var if needed
+STATICFILES_STORAGE = os.environ.get(
+    'STATICFILES_STORAGE',
+    'whitenoise.storage.CompressedManifestStaticFilesStorage',
+)
