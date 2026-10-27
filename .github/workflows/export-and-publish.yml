@@ -1,103 +1,103 @@
-name: Export full site and publish to GitHub Pages
+# name: Export full site and publish to GitHub Pages
 
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'Django_prep/**'
-      - 'templates/**'
-      - 'static/**'
-      - 'Dockerfile'
+# on:
+#   push:
+#     branches: [ main ]
+#     paths:
+#       - 'Django_prep/**'
+#       - 'templates/**'
+#       - 'static/**'
+#       - 'Dockerfile'
 
-permissions:
-  contents: write
+# permissions:
+#   contents: write
 
-jobs:
-  export:
-    runs-on: ubuntu-latest
+# jobs:
+#   export:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.12'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r Django_prep/requirements.txt
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r Django_prep/requirements.txt
 
-      - name: Collect static
-        run: |
-          python Django_prep/manage.py collectstatic --noinput
+#       - name: Collect static
+#         run: |
+#           python Django_prep/manage.py collectstatic --noinput
 
-      - name: Start Django (background)
-        run: |
-          # start without the autoreloader so the process stays in background
-          nohup python Django_prep/manage.py runserver 0.0.0.0:8000 --noreload &>/dev/null &
+#       - name: Start Django (background)
+#         run: |
+#           # start without the autoreloader so the process stays in background
+#           nohup python Django_prep/manage.py runserver 0.0.0.0:8000 --noreload &>/dev/null &
 
-      - name: Wait for local site to be ready
-        run: |
-          for i in {1..30}; do
-            if curl -sSf http://127.0.0.1:8000 >/dev/null 2>&1; then
-              echo "site is up"; break
-            else
-              echo "waiting..."; sleep 1
-            fi
-          done
+#       - name: Wait for local site to be ready
+#         run: |
+#           for i in {1..30}; do
+#             if curl -sSf http://127.0.0.1:8000 >/dev/null 2>&1; then
+#               echo "site is up"; break
+#             else
+#               echo "waiting..."; sleep 1
+#             fi
+#           done
 
-      - name: Mirror site with wget
-        run: |
-          # mirror the entire site into ./site (avoid host-named directory)
-          wget --mirror --convert-links --adjust-extension --page-requisites --no-parent \
-            --no-host-directories -nH --directory-prefix=site http://127.0.0.1:8000 -o site/wget.log || true
-          # fallback: if wget created nested host-dir, move contents
-          if [ -d ./site/127.0.0.1:8000 ]; then
-            shopt -s dotglob || true
-            mv ./site/127.0.0.1:8000/* ./site/ || true
-            rm -rf ./site/127.0.0.1:8000 || true
-          fi
+#       - name: Mirror site with wget
+#         run: |
+#           # mirror the entire site into ./site (avoid host-named directory)
+#           wget --mirror --convert-links --adjust-extension --page-requisites --no-parent \
+#             --no-host-directories -nH --directory-prefix=site http://127.0.0.1:8000 -o site/wget.log || true
+#           # fallback: if wget created nested host-dir, move contents
+#           if [ -d ./site/127.0.0.1:8000 ]; then
+#             shopt -s dotglob || true
+#             mv ./site/127.0.0.1:8000/* ./site/ || true
+#             rm -rf ./site/127.0.0.1:8000 || true
+#           fi
 
-      - name: Debug site folder
-        run: |
-          echo "site folder recursive listing:" && ls -laR ./site || true
-          echo "wget log (tail):" && tail -n 200 site/wget.log || true
-          echo "top-level files in workspace:" && ls -la || true
+#       - name: Debug site folder
+#         run: |
+#           echo "site folder recursive listing:" && ls -laR ./site || true
+#           echo "wget log (tail):" && tail -n 200 site/wget.log || true
+#           echo "top-level files in workspace:" && ls -la || true
 
-      - name: Clean up site folder
-        run: |
-          # remove any Git metadata and unnecessary files
-          rm -rf site/**/.git || true
+#       - name: Clean up site folder
+#         run: |
+#           # remove any Git metadata and unnecessary files
+#           rm -rf site/**/.git || true
 
-      - name: Force-push exported site to gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin
-          echo "branches:" && git branch -a || true
-          # Prepare branch
-          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
-            git checkout gh-pages
-            git rm -rf . || true
-          else
-            git checkout --orphan gh-pages
-          fi
-          echo "current branch:" && git rev-parse --abbrev-ref HEAD || true
-          # Copy site contents into repo root
-          cp -r site/. . || true
-          echo "files staged for commit:" && git add -A && git status --porcelain || true
-          # Ensure .nojekyll exists to allow GitHub Pages
-          touch .nojekyll
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No changes to publish"
-          else
-            git commit -m "Publish site from export workflow: ${GITHUB_SHA}"
-            git push origin HEAD:gh-pages --force
-          fi
+#       - name: Force-push exported site to gh-pages
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           set -e
+#           git config user.name "github-actions[bot]"
+#           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+#           git fetch origin
+#           echo "branches:" && git branch -a || true
+#           # Prepare branch
+#           if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+#             git checkout gh-pages
+#             git rm -rf . || true
+#           else
+#             git checkout --orphan gh-pages
+#           fi
+#           echo "current branch:" && git rev-parse --abbrev-ref HEAD || true
+#           # Copy site contents into repo root
+#           cp -r site/. . || true
+#           echo "files staged for commit:" && git add -A && git status --porcelain || true
+#           # Ensure .nojekyll exists to allow GitHub Pages
+#           touch .nojekyll
+#           git add -A
+#           if git diff --cached --quiet; then
+#             echo "No changes to publish"
+#           else
+#             git commit -m "Publish site from export workflow: ${GITHUB_SHA}"
+#             git push origin HEAD:gh-pages --force
+#           fi

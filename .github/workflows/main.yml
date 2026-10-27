@@ -1,64 +1,64 @@
-name: Build and Publish Docker Image
+# name: Build and Publish Docker Image
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Django_prep/**'
-      - 'Dockerfile'
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'Django_prep/**'
+#       - 'Dockerfile'
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write
+# permissions:
+#   contents: read
+#   packages: write
+#   id-token: write
 
-env:
-  AWS_REGION: us-east-1
-  ECR_REPOSITORY: django-portfolio
-  ECS_CLUSTER: django-portfolio-cluster
-  ECS_SERVICE: django-portfolio
+# env:
+#   AWS_REGION: us-east-1
+#   ECR_REPOSITORY: django-portfolio
+#   ECS_CLUSTER: django-portfolio-cluster
+#   ECS_SERVICE: django-portfolio
 
-jobs:
-  docker:
-    name: Build and publish Docker image
-    runs-on: ubuntu-latest
+# jobs:
+#   docker:
+#     name: Build and publish Docker image
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+#           aws-region: ${{ env.AWS_REGION }}
 
-      # No DB secrets required for build/publish
+#       # No DB secrets required for build/publish
 
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+#       - name: Log in to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+#       - name: Build and push Docker image
+#         uses: docker/build-push-action@v6
+#         with:
+#           context: .
+#           # push: true
+#           tags: |
+#             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+#             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
-      - name: Force ECS to deploy the new image
-        run: |
-          aws ecs update-service \
-            --cluster "$ECS_CLUSTER" \
-            --service "$ECS_SERVICE" \
-            --force-new-deployment
+#       - name: Force ECS to deploy the new image
+#         run: |
+#           aws ecs update-service \
+#             --cluster "$ECS_CLUSTER" \
+#             --service "$ECS_SERVICE" \
+#             --force-new-deployment
 
-      - name: Wait for ECS deployment
-        run: |
-          aws ecs wait services-stable \
-            --cluster "$ECS_CLUSTER" \
-            --services "$ECS_SERVICE"
+#       - name: Wait for ECS deployment
+#         run: |
+#           aws ecs wait services-stable \
+#             --cluster "$ECS_CLUSTER" \
+#             --services "$ECS_SERVICE"
 
