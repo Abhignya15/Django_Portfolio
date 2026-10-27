@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "Django_prep/wsgi.py": {
+      "maxDuration": 30
+    }
+  }
+}
